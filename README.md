@@ -1,1 +1,1 @@
-# Original de Paint.py
+# Juego de pacman
