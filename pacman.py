@@ -131,18 +131,37 @@ def move():
     dot(20, 'yellow')
 
     for point, course in ghosts:
-        if valid(point + course):
-            point.move(course)
-        else:
-            options = [
-                vector(5, 0),
-                vector(-5, 0),
-                vector(0, 5),
-                vector(0, -5),
-            ]
-            plan = choice(options)
-            course.x = plan.x
-            course.y = plan.y
+        """
+        - Los fantasmas ahora intentan moverse hacia la dirección
+          que los acerque más al Pac-Man.
+        - Si esa dirección no es válida (por una pared),
+          eligen una dirección válida aleatoria.
+        - Así se comportan de manera más “lista”, en lugar de moverse al azar.
+        """
+
+        options = [
+            vector(5, 0),
+            vector(-5, 0),
+            vector(0, 5),
+            vector(0, -5),
+        ]
+
+        best = course
+        min_dist = abs(pacman - (point + course))
+
+        for option in options:
+            if valid(point + option):
+                dist = abs(pacman - (point + option))
+                if dist < min_dist:
+                    min_dist = dist
+                    best = option
+
+        if not valid(point + best):
+            best = choice([v for v in options if valid(point + v)])
+
+        point.move(best)
+        course.x = best.x
+        course.y = best.y
 
         up()
         goto(point.x + 10, point.y + 10)
@@ -178,3 +197,4 @@ onkey(lambda: change(0, -5), 'Down')
 world()
 move()
 done()
+
